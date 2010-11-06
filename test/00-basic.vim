@@ -9,18 +9,30 @@ set cpo&vim
 
 
 function! s:run()
-    nmap foo blahblahblah
-
-    let foo_nmap = tempmap#save_map('n', 'foo')
-    if empty(foo_nmap)
-        echoerr 'your vim version is lower than 7.3.032!'
+    if !tempmap#supported_version()
+        return
     endif
 
+    nmap foo blahblahblah
+    let foo_nmap = tempmap#save_map('n', 'foo')
     nmap foo bar
-
+    Is maparg('foo', 'n'), 'bar', "nmap: foo's rhs is bar"
     call foo_nmap.restore()
+    Is maparg('foo', 'n'), 'blahblahblah', "nmap: foo's rhs is blahblahblah"
 
-    Is maparg('foo', 'n'), 'blahblahblah', "foo's rhs is blahblahblah"
+    iab foo blahblahblah
+    let foo_iab = tempmap#save_abbr('i', 'foo')
+    iab foo bar
+    Is maparg('foo', 'i', 1), 'bar', "iab: foo's rhs is bar"
+    call foo_iab.restore()
+    Is maparg('foo', 'i', 1), 'blahblahblah', "iab: foo's rhs is blahblahblah"
+
+    cab foo blahblahblah
+    let foo_cab = tempmap#save_abbr('c', 'foo')
+    cab foo bar
+    Is maparg('foo', 'c', 1), 'bar', "cab: foo's rhs is bar"
+    call foo_cab.restore()
+    Is maparg('foo', 'c', 1), 'blahblahblah', "cab: foo's rhs is blahblahblah"
 endfunction
 
 call s:run()

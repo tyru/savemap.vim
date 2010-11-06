@@ -32,13 +32,14 @@ function! s:save_map(mode, is_abbr, ...) "{{{
             return {}
         endif
 
-        let o = {'__map_dict': map_dict}
+        let o = {'__map_dict': map_dict, '__is_abbr': a:is_abbr}
         function o.restore()
             " TODO: o.sid
             let o = self.__map_dict
             for mode in s:each_modes(o.mode)
                 execute
-                \   mode . (o.noremap ? 'nore' : '') . 'map'
+                \   mode . (o.noremap ? 'nore' : '')
+                \       . (self.__is_abbr ? 'abbr' : 'map')
                 \   s:convert_options(o)
                 \   o.lhs
                 \   o.rhs
