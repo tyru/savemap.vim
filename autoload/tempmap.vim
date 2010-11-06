@@ -84,7 +84,7 @@ endfunction "}}}
 function! s:convert_options(map_dict) "{{{
     return join(map(
     \   ['silent', 'expr', 'buffer'],
-    \   'get(a:map_dict, v:val, "")'
+    \   'a:map_dict[v:val] ? "<" . v:val . ">" : ""'
     \), '')
 endfunction "}}}
 
