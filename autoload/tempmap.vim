@@ -13,7 +13,7 @@ set cpo&vim
 " }}}
 
 
-function! tempmap#map(mode, ...) "{{{
+function! tempmap#save_map(mode, ...) "{{{
     if !(v:version >= 703 && has('patch32'))
         return {}
     endif
@@ -43,7 +43,7 @@ function! tempmap#map(mode, ...) "{{{
         endfunction
         return o
     else
-        return map(s:get_all_lhs(a:mode), 'tempmap#map(a:mode, v:val)')
+        return map(s:get_all_lhs(a:mode), 'tempmap#save_map(a:mode, v:val)')
     endif
 endfunction "}}}
 
