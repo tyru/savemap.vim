@@ -27,7 +27,7 @@ function! s:save_map(mode, is_abbr, ...) "{{{
     endif
 
     if a:0
-        let map_dict = maparg(a:1, '', a:is_abbr, 1)
+        let map_dict = maparg(a:1, a:mode, a:is_abbr, 1)
         if empty(map_dict)
             return {}
         endif
