@@ -51,7 +51,7 @@ function! s:save_map(mode, is_abbr, ...) "{{{
 endfunction "}}}
 
 function! tempmap#supported_version() "{{{
-    return v:version >= 703 && has('patch32')
+    return v:version > 703 || v:version == 703 && has('patch32')
 endfunction "}}}
 
 function! s:get_all_lhs(mode, ...) "{{{
