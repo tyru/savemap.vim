@@ -22,7 +22,7 @@ function! tempmap#save_abbr(mode, ...) "{{{
 endfunction "}}}
 
 function! s:save_map(mode, is_abbr, ...) "{{{
-    if !(v:version >= 703 && has('patch32'))
+    if !tempmap#supported_version()
         return {}
     endif
 
@@ -48,6 +48,10 @@ function! s:save_map(mode, is_abbr, ...) "{{{
     else
         return map(s:get_all_lhs(a:mode), 'tempmap#save_map(a:mode, v:val)')
     endif
+endfunction "}}}
+
+function! tempmap#supported_version() "{{{
+    return v:version >= 703 && has('patch32')
 endfunction "}}}
 
 function! s:get_all_lhs(mode, ...) "{{{

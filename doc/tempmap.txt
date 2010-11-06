@@ -77,6 +77,9 @@ tempmap#save_map({mode} [, {lhs}])		*tempmap#save_map()*
 tempmap#save_abbr({mode} [, {lhs}])		*tempmap#save_abbr()*
 	|Abbreviation| version of |tempmap#save_map()|.
 
+tempmap#supported_version()				*tempmap#supported_version()*
+	Return non-zero if Vim supported the 4th argument of |maparg()|.
+
 }}}
 }}}
 ==============================================================================
