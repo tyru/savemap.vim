@@ -34,11 +34,6 @@ function! s:save_map(mode, is_abbr, ...) "{{{
 
         let o = {'__map_dict': map_dict}
         function o.restore()
-            if empty(self.__map_dict)
-                " The mapping does not exist.
-                return
-            endif
-
             " TODO: o.sid
             let o = self.__map_dict
             for mode in s:each_modes(o.mode)
