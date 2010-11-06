@@ -19,7 +19,7 @@ Changelog			|tempmap-changelog|
 INTRODUCTION						*tempmap-introduction* {{{
 
 |tempmap| is the library to provide a way
-to restore current mapping(s) "perfectly".
+to restore current mapping(s)/abbreviation(s) "perfectly".
 
 ...But remember, you can always use |:map-<buffer>| for "simple" case.
 
@@ -73,6 +73,9 @@ tempmap#save_map({mode} [, {lhs}])		*tempmap#save_map()*
 	are returned by |List|.
 	If Vim does not support the 4th argument of |maparg()|,
 	Return empty |Dictionary|.
+
+tempmap#save_abbr({mode} [, {lhs}])		*tempmap#save_abbr()*
+	|Abbreviation| version of |tempmap#save_map()|.
 
 }}}
 }}}

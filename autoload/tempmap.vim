@@ -14,12 +14,20 @@ set cpo&vim
 
 
 function! tempmap#save_map(mode, ...) "{{{
+    return call('s:save_map', [a:mode, 0] + a:000)
+endfunction "}}}
+
+function! tempmap#save_abbr(mode, ...) "{{{
+    return call('s:save_map', [a:mode, 1] + a:000)
+endfunction "}}}
+
+function! s:save_map(mode, is_abbr, ...) "{{{
     if !(v:version >= 703 && has('patch32'))
         return {}
     endif
 
     if a:0
-        let map_dict = maparg(a:1, '', 0, 1)
+        let map_dict = maparg(a:1, '', a:is_abbr, 1)
         if empty(map_dict)
             return {}
         endif
