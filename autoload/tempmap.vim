@@ -64,7 +64,21 @@ function! s:get_all_lhs(mode, ...) "{{{
     return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'empty(v:val)')
 endfunction "}}}
 
-function! s:each_modes() "{{{
+function! s:each_modes(modes) "{{{
+    let h = {}
+    for _ in split(a:modes, '\zs')
+        if _ ==# ' '
+            let h['n'] = 1
+            let h['v'] = 1
+            let h['o'] = 1
+        elseif _ ==# '!'
+            let h['i'] = 1
+            let h['c'] = 1
+        else
+            let h[_] = 1
+        endif
+    endfor
+    return keys(h)
 endfunction "}}}
 
 function! s:convert_options(map_dict) "{{{
