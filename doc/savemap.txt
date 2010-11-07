@@ -61,6 +61,10 @@ Omit 2nd arg of |savemap#save_map()| to save all mappings of the mode.
         call normal_mappings.restore()
     endtry
 
+
+Requirements:
+- Vim 7.3 or higher
+
 }}}
 ==============================================================================
 INTERFACE				*savemap-interface* {{{
