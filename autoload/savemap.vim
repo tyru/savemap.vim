@@ -2,10 +2,10 @@
 scriptencoding utf-8
 
 " Load Once {{{
-if exists('g:loaded_tempmap') && g:loaded_tempmap
+if exists('g:loaded_savemap') && g:loaded_savemap
     finish
 endif
-let g:loaded_tempmap = 1
+let g:loaded_savemap = 1
 " }}}
 " Saving 'cpoptions' {{{
 let s:save_cpo = &cpo
@@ -13,16 +13,16 @@ set cpo&vim
 " }}}
 
 
-function! tempmap#save_map(mode, ...) "{{{
+function! savemap#save_map(mode, ...) "{{{
     return call('s:save_map', [a:mode, 0] + a:000)
 endfunction "}}}
 
-function! tempmap#save_abbr(mode, ...) "{{{
+function! savemap#save_abbr(mode, ...) "{{{
     return call('s:save_map', [a:mode, 1] + a:000)
 endfunction "}}}
 
 function! s:save_map(mode, is_abbr, ...) "{{{
-    if !tempmap#supported_version()
+    if !savemap#supported_version()
         return {}
     endif
 
@@ -46,11 +46,11 @@ function! s:save_map(mode, is_abbr, ...) "{{{
         endfunction
         return o
     else
-        return map(s:get_all_lhs(a:mode), 'tempmap#save_map(a:mode, v:val)')
+        return map(s:get_all_lhs(a:mode), 'savemap#save_map(a:mode, v:val)')
     endif
 endfunction "}}}
 
-function! tempmap#supported_version() "{{{
+function! savemap#supported_version() "{{{
     return v:version > 703 || v:version == 703 && has('patch32')
 endfunction "}}}
 

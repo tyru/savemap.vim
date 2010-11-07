@@ -1,4 +1,4 @@
-*tempmap.txt* *tempmap*
+*savemap.txt* *savemap*
 
 Author:
   tyru <tyru.exe@gmail.com>
@@ -6,19 +6,19 @@ Version: 0.0.0
 License: Under the same license as Vim itself (see :help license)
 
 ==============================================================================
-CONTENTS						*tempmap-contents*
+CONTENTS						*savemap-contents*
 
-Introduction		|tempmap-introduction|
-Interface			|tempmap-interface|
-  Functions			|tempmap-functions|
-TODO				|tempmap-todo|
-Changelog			|tempmap-changelog|
+Introduction		|savemap-introduction|
+Interface			|savemap-interface|
+  Functions			|savemap-functions|
+TODO				|savemap-todo|
+Changelog			|savemap-changelog|
 
 
 ==============================================================================
-INTRODUCTION						*tempmap-introduction* {{{
+INTRODUCTION						*savemap-introduction* {{{
 
-|tempmap| is the library to provide a way
+|savemap| is the library to provide a way
 to restore current mapping(s)/abbreviation(s) "perfectly".
 
 ...But remember, you can always use |:map-<buffer>| for "simple" case.
@@ -26,7 +26,7 @@ to restore current mapping(s)/abbreviation(s) "perfectly".
 >
     nmap foo blahblahblah
 
-    let foo_nmap = tempmap#save_map('n', 'foo')
+    let foo_nmap = savemap#save_map('n', 'foo')
     if empty(foo_nmap)
         echoerr 'your vim version is lower than 7.3.032!'
     endif
@@ -40,9 +40,9 @@ to restore current mapping(s)/abbreviation(s) "perfectly".
     normal foo
 
 
-Omit 2nd arg of |tempmap#save_map()| to save all mappings of the mode.
+Omit 2nd arg of |savemap#save_map()| to save all mappings of the mode.
 >
-    let normal_mappings = tempmap#save_map('n')
+    let normal_mappings = savemap#save_map('n')
     if empty(normal_mappings)
         echoerr 'your vim version is lower than 7.3.032!'
     endif
@@ -63,30 +63,30 @@ Omit 2nd arg of |tempmap#save_map()| to save all mappings of the mode.
 
 }}}
 ==============================================================================
-INTERFACE				*tempmap-interface* {{{
+INTERFACE				*savemap-interface* {{{
 ------------------------------------------------------------------------------
-FUNCTIONS					*tempmap-functions* {{{
+FUNCTIONS					*savemap-functions* {{{
 
-tempmap#save_map({mode} [, {lhs}])		*tempmap#save_map()*
+savemap#save_map({mode} [, {lhs}])		*savemap#save_map()*
 	Return non-empty |Dictionary|
 	If {lhs} was omitted, all mappings in {mode}
 	are returned by |List|.
 	If Vim does not support the 4th argument of |maparg()|,
 	Return empty |Dictionary|.
 
-tempmap#save_abbr({mode} [, {lhs}])		*tempmap#save_abbr()*
-	|Abbreviation| version of |tempmap#save_map()|.
+savemap#save_abbr({mode} [, {lhs}])		*savemap#save_abbr()*
+	|Abbreviation| version of |savemap#save_map()|.
 
-tempmap#supported_version()				*tempmap#supported_version()*
+savemap#supported_version()				*savemap#supported_version()*
 	Return non-zero if Vim supported the 4th argument of |maparg()|.
 
 }}}
 }}}
 ==============================================================================
-TODO						*tempmap-todo* {{{
+TODO						*savemap-todo* {{{
 }}}
 ==============================================================================
-CHANGELOG						*tempmap-changelog* {{{
+CHANGELOG						*savemap-changelog* {{{
 
 0.0.0:
 - Initial upload
