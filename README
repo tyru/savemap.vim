@@ -1,5 +1,5 @@
 
-|tempmap| is the library to provide a way
+|savemap| is the library to provide a way
 to restore current mapping(s)/abbreviation(s) "perfectly".
 
 ...But remember, you can always use |:map-<buffer>| for "simple" case.
@@ -7,7 +7,7 @@ to restore current mapping(s)/abbreviation(s) "perfectly".
 >
     nmap foo blahblahblah
 
-    let foo_nmap = tempmap#save_map('n', 'foo')
+    let foo_nmap = savemap#save_map('n', 'foo')
     if empty(foo_nmap)
         echoerr 'your vim version is lower than 7.3.032!'
     endif
@@ -21,9 +21,9 @@ to restore current mapping(s)/abbreviation(s) "perfectly".
     normal foo
 
 
-Omit 2nd arg of |tempmap#save_map()| to save all mappings of the mode.
+Omit 2nd arg of |savemap#save_map()| to save all mappings of the mode.
 >
-    let normal_mappings = tempmap#save_map('n')
+    let normal_mappings = savemap#save_map('n')
     if empty(normal_mappings)
         echoerr 'your vim version is lower than 7.3.032!'
     endif
@@ -43,4 +43,4 @@ Omit 2nd arg of |tempmap#save_map()| to save all mappings of the mode.
     endtry
 
 
-See doc/tempmap.txt or :help tempmap for more details.
+See doc/savemap.txt or :help savemap for more details.
