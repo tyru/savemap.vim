@@ -13,7 +13,11 @@ set cpo&vim
 " }}}
 
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 0, 17))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 0, 18))
+
+function! savemap#load() "{{{
+    " dummy function to load this script
+endfunction "}}}
 
 function! savemap#save_map(mode, ...) "{{{
     return call('s:save_map', [a:mode, 0] + a:000)

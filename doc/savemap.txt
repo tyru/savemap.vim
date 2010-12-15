@@ -71,6 +71,9 @@ INTERFACE				*savemap-interface* {{{
 ------------------------------------------------------------------------------
 FUNCTIONS					*savemap-functions* {{{
 
+savemap#load()							*savemap#load()*
+	Load autoload/savemap.vim .
+
 savemap#save_map({mode} [, {lhs}])		*savemap#save_map()*
 	Return non-empty |Dictionary|
 	If {lhs} was omitted, all mappings in {mode}
