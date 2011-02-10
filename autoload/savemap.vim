@@ -13,7 +13,7 @@ set cpo&vim
 " }}}
 
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 0))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 1))
 
 function! savemap#load() "{{{
     " dummy function to load this script
@@ -32,25 +32,25 @@ function! s:save_map(is_abbr, mode, ...) "{{{
         return {}
     endif
 
-    let o = {
+    let map_dict = {
     \   '__restore_map_dict': s:local_func('MapDict_restore_map_dict'),
     \   '__is_abbr': a:is_abbr,
     \}
     if a:0
-        let o.restore = s:local_func('MapDict_restore_a_map')
-        let o.__map_dict = maparg(a:1, a:mode, a:is_abbr, 1)
+        let map_dict.restore = s:local_func('MapDict_restore_a_map')
+        let map_dict.__map_info = maparg(a:1, a:mode, a:is_abbr, 1)
     else
-        let o.restore = s:local_func('MapDict_restore_mappings')
-        let o.__map_dict = []
+        let map_dict.restore = s:local_func('MapDict_restore_mappings')
+        let map_dict.__map_info = []
         for lhs in s:get_all_lhs(a:mode)
             call add(
-            \   o.__map_dict,
+            \   map_dict.__map_info,
             \   maparg(lhs, a:mode, a:is_abbr, 1)
             \)
         endfor
     endif
 
-    return o
+    return map_dict
 endfunction "}}}
 
 function s:SID() "{{{
@@ -76,11 +76,11 @@ function s:MapDict_restore_map_dict(map_dict) dict "{{{
 endfunction "}}}
 
 function! s:MapDict_restore_a_map() dict "{{{
-    call self.__restore_map_dict(self.__map_dict)
+    call self.__restore_map_dict(self.__map_info)
 endfunction "}}}
 
 function! s:MapDict_restore_mappings() dict "{{{
-    for d in self.__map_dict
+    for d in self.__map_info
         call self.__restore_map_dict(d)
     endfor
 endfunction "}}}
@@ -116,10 +116,10 @@ function! s:each_modes(modes) "{{{
     return keys(h)
 endfunction "}}}
 
-function! s:convert_options(map_dict) "{{{
+function! s:convert_options(maparg) "{{{
     return join(map(
     \   ['silent', 'expr', 'buffer'],
-    \   'a:map_dict[v:val] ? "<" . v:val . ">" : ""'
+    \   'a:maparg[v:val] ? "<" . v:val . ">" : ""'
     \), '')
 endfunction "}}}
 
