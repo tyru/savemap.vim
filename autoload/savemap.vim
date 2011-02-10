@@ -13,7 +13,7 @@ set cpo&vim
 " }}}
 
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 2))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 3))
 
 function! savemap#load() "{{{
     " dummy function to load this script
@@ -37,14 +37,14 @@ function! s:save_map(is_abbr, mode, ...) "{{{
     \}
     if a:0
         let map_dict.restore = s:local_func('MapDict_restore_a_map')
-        let map_dict.__map_info = maparg(a:1, a:mode, a:is_abbr, 1)
+        let map_dict.__map_info = s:get_map_info(a:mode, a:1, a:is_abbr)
     else
         let map_dict.restore = s:local_func('MapDict_restore_mappings')
         let map_dict.__map_info = []
         for lhs in s:get_all_lhs(a:mode)
             call add(
             \   map_dict.__map_info,
-            \   maparg(lhs, a:mode, a:is_abbr, 1)
+            \   s:get_map_info(a:mode, lhs, a:is_abbr)
             \)
         endfor
     endif
@@ -62,7 +62,46 @@ function! s:local_func(name) "{{{
     return function('<SNR>' . s:SID_PREFIX . '_' . a:name)
 endfunction "}}}
 
+function! s:get_map_info(mode, lhs, is_abbr) "{{{
+    let r = {
+    \   'buffer': {},
+    \   'normal': {},
+    \}
+
+    let info = maparg(a:lhs, a:mode, a:is_abbr, 1)
+    if empty(info)
+        " No such a mapping for a:lhs
+    elseif info.buffer
+        " <buffer>
+        let r.buffer = info
+        " Also save a non-<buffer> mapping if it exists.
+        call s:do_unmap_silently(a:mode, a:lhs, a:is_abbr, 1)
+        let r.normal = maparg(a:lhs, a:mode, a:is_abbr, 1)
+        call s:restore_map_info(r.buffer, a:is_abbr)
+    else
+        " non-<buffer>
+        let r.normal = info
+    endif
+
+    return r
+endfunction "}}}
+
+function! s:do_unmap_silently(mode, lhs, is_abbr, is_buffer) "{{{
+    if a:mode == '' || a:lhs == ''
+        return
+    endif
+    " Even if no such a mapping for a:lhs,
+    " this does not raise an error.
+    silent! execute
+    \   a:mode . (a:is_abbr ? 'unabbr' : 'unmap')
+    \   (a:is_buffer ? '<buffer>' : '')
+    \   a:lhs
+endfunction "}}}
+
 function! s:restore_map_info(map_info, is_abbr) "{{{
+    if empty(a:map_info)
+        return
+    endif
     for mode in s:each_modes(a:map_info.mode)
         execute
         \   mode . (a:map_info.noremap ? 'nore' : '')
@@ -75,12 +114,14 @@ endfunction "}}}
 
 " MapDict {{{
 function! s:MapDict_restore_a_map() dict "{{{
-    call s:restore_map_info(self.__map_info, self.__is_abbr)
+    call s:restore_map_info(self.__map_info.normal, self.__is_abbr)
+    call s:restore_map_info(self.__map_info.buffer, self.__is_abbr)
 endfunction "}}}
 
 function! s:MapDict_restore_mappings() dict "{{{
     for d in self.__map_info
-        call s:restore_map_info(d, self.__is_abbr)
+        call s:restore_map_info(d.normal, self.__is_abbr)
+        call s:restore_map_info(d.buffer, self.__is_abbr)
     endfor
 endfunction "}}}
 " }}}
