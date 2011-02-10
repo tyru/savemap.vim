@@ -75,9 +75,10 @@ savemap#load()							*savemap#load()*
 	Load autoload/savemap.vim .
 
 savemap#save_map({mode} [, {lhs}])		*savemap#save_map()*
-	Return non-empty |Dictionary|
-	If {lhs} was omitted, all mappings in {mode}
-	are returned by |List|.
+	Return non-empty |Dictionary| which has .restore() method
+	to restore the mapping.
+	If {lhs} was omitted,
+	.restore() will restore all mappings in {mode}.
 	If Vim does not support the 4th argument of |maparg()|,
 	Return empty |Dictionary|.
 

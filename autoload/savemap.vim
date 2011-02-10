@@ -13,7 +13,7 @@ set cpo&vim
 " }}}
 
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 0, 19))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 0))
 
 function! savemap#load() "{{{
     " dummy function to load this script
@@ -32,29 +32,59 @@ function! s:save_map(is_abbr, mode, ...) "{{{
         return {}
     endif
 
+    let o = {
+    \   '__restore_map_dict': s:local_func('MapDict_restore_map_dict'),
+    \   '__is_abbr': a:is_abbr,
+    \}
     if a:0
-        let map_dict = maparg(a:1, a:mode, a:is_abbr, 1)
-        if empty(map_dict)
-            return {}
-        endif
-
-        let o = {'__map_dict': map_dict, '__is_abbr': a:is_abbr}
-        function o.restore()
-            let o = self.__map_dict
-            for mode in s:each_modes(o.mode)
-                execute
-                \   mode . (o.noremap ? 'nore' : '')
-                \       . (self.__is_abbr ? 'abbr' : 'map')
-                \   s:convert_options(o)
-                \   o.lhs
-                \   o.rhs
-            endfor
-        endfunction
-        return o
+        let o.restore = s:local_func('MapDict_restore_a_map')
+        let o.__map_dict = maparg(a:1, a:mode, a:is_abbr, 1)
     else
-        return map(s:get_all_lhs(a:mode), 'savemap#save_map(a:mode, v:val)')
+        let o.restore = s:local_func('MapDict_restore_mappings')
+        let o.__map_dict = []
+        for lhs in s:get_all_lhs(a:mode)
+            call add(
+            \   o.__map_dict,
+            \   maparg(lhs, a:mode, a:is_abbr, 1)
+            \)
+        endfor
     endif
+
+    return o
 endfunction "}}}
+
+function s:SID() "{{{
+    return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction "}}}
+let s:SID_PREFIX = s:SID()
+delfunc s:SID
+
+function! s:local_func(name) "{{{
+    return function('<SNR>' . s:SID_PREFIX . '_' . a:name)
+endfunction "}}}
+
+" MapDict {{{
+function s:MapDict_restore_map_dict(map_dict) dict "{{{
+    for mode in s:each_modes(a:map_dict.mode)
+        execute
+        \   mode . (a:map_dict.noremap ? 'nore' : '')
+        \       . (self.__is_abbr ? 'abbr' : 'map')
+        \   s:convert_options(a:map_dict)
+        \   a:map_dict.lhs
+        \   a:map_dict.rhs
+    endfor
+endfunction "}}}
+
+function! s:MapDict_restore_a_map() dict "{{{
+    call self.__restore_map_dict(self.__map_dict)
+endfunction "}}}
+
+function! s:MapDict_restore_mappings() dict "{{{
+    for d in self.__map_dict
+        call self.__restore_map_dict(d)
+    endfor
+endfunction "}}}
+" }}}
 
 function! savemap#supported_version() "{{{
     return v:version > 703 || v:version == 703 && has('patch32')
