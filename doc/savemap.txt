@@ -74,15 +74,79 @@ FUNCTIONS					*savemap-functions* {{{
 savemap#load()							*savemap#load()*
 	Load autoload/savemap.vim .
 
-savemap#save_map({mode} [, {lhs}])		*savemap#save_map()*
+									*savemap#save_map()*
+savemap#save_map({mode} [, {lhs}])   or
+savemap#save_map({options})          or
+savemap#save_map({options1} [, {options2} ...])
 	Return non-empty |Dictionary| which has .restore() method
 	to restore the mapping.
-	If {lhs} was omitted,
+
+	In the 1st form, if {lhs} was omitted,
 	.restore() will restore all mappings in {mode}.
+
+	In the 2nd form, you can filter in all mappings
+	with {options} keys & values.
+	{options} is a |Dictionary| like the following:
+		"lhs"
+			The {lhs} of the mapping.
+		"rhs"
+			The {rhs} of the mapping as typed.
+		"lhs-regexp"
+			(TODO)
+		"rhs-regexp"
+			(TODO)
+		"silent"
+			non-zero for a |:map-silent| mapping.
+			zero for a non-|:map-silent| mapping.
+			If the key does not exist,
+			get the both of mappings.
+		"noremap"
+			non-zero if the {rhs} of the mapping is not remappable.
+			zero if the {rhs} of the mapping is remappable.
+			If the key does not exist,
+			get the both of mappings.
+		"expr"
+			non-zero for an expression mapping (|:map-<expr>|).
+			zero for a non-expression mapping.
+			If the key does not exist,
+			get the both of mappings.
+		"buffer"
+			non-zero for a buffer local mapping (|:map-local|).
+			zero for a non-buffer local mapping.
+			If the key does not exist,
+			get the both of mappings.
+		"mode"
+			Modes for which the mapping is defined.
+			these characters will be used:
+			"n"		Normal
+			"v"		Visual (including Select)
+			"o"		Operator-pending
+			"i"		Insert
+			"c"		Cmd-line
+			"s"		Select
+			"x"		Visual
+			"l"		langmap |language-mapping|
+			" "		Normal, Visual and Operator-pending
+			"!"		Insert and Commandline mode
+			(|mapmode-ic|)
+		"sid"
+			The script local ID, used for <sid> mappings
+			(|<SID>|).
+			If the key does not exist,
+			get all mappings.
+
+	As you see above, this function
+	was designed like |maparg()|.
+
+	the 3rd form is TODO.
+
 	If Vim does not support the 4th argument of |maparg()|,
 	Return empty |Dictionary|.
 
-savemap#save_abbr({mode} [, {lhs}])		*savemap#save_abbr()*
+								*savemap#save_abbr()*
+savemap#save_abbr({mode} [, {lhs}])   or
+savemap#save_abbr({options})          or
+savemap#save_abbr({options1} [, {options2} ...])
 	|Abbreviation| version of |savemap#save_map()|.
 
 savemap#supported_version()				*savemap#supported_version()*
