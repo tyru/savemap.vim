@@ -13,7 +13,7 @@ set cpo&vim
 " }}}
 
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 1))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 2))
 
 function! savemap#load() "{{{
     " dummy function to load this script
@@ -33,7 +33,6 @@ function! s:save_map(is_abbr, mode, ...) "{{{
     endif
 
     let map_dict = {
-    \   '__restore_map_dict': s:local_func('MapDict_restore_map_dict'),
     \   '__is_abbr': a:is_abbr,
     \}
     if a:0
@@ -63,25 +62,25 @@ function! s:local_func(name) "{{{
     return function('<SNR>' . s:SID_PREFIX . '_' . a:name)
 endfunction "}}}
 
-" MapDict {{{
-function s:MapDict_restore_map_dict(map_dict) dict "{{{
-    for mode in s:each_modes(a:map_dict.mode)
+function! s:restore_map_info(map_info, is_abbr) "{{{
+    for mode in s:each_modes(a:map_info.mode)
         execute
-        \   mode . (a:map_dict.noremap ? 'nore' : '')
-        \       . (self.__is_abbr ? 'abbr' : 'map')
-        \   s:convert_options(a:map_dict)
-        \   a:map_dict.lhs
-        \   a:map_dict.rhs
+        \   mode . (a:map_info.noremap ? 'nore' : '')
+        \       . (a:is_abbr ? 'abbr' : 'map')
+        \   s:convert_options(a:map_info)
+        \   a:map_info.lhs
+        \   a:map_info.rhs
     endfor
 endfunction "}}}
 
+" MapDict {{{
 function! s:MapDict_restore_a_map() dict "{{{
-    call self.__restore_map_dict(self.__map_info)
+    call s:restore_map_info(self.__map_info, self.__is_abbr)
 endfunction "}}}
 
 function! s:MapDict_restore_mappings() dict "{{{
     for d in self.__map_info
-        call self.__restore_map_dict(d)
+        call s:restore_map_info(d, self.__is_abbr)
     endfor
 endfunction "}}}
 " }}}
