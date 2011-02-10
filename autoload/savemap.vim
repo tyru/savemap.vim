@@ -12,8 +12,9 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 4))
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 3))
+" Interface {{{
 
 function! savemap#load() "{{{
     " dummy function to load this script
@@ -26,6 +27,26 @@ endfunction "}}}
 function! savemap#save_abbr(...) "{{{
     return call('s:save_map', [1] + a:000)
 endfunction "}}}
+
+function! savemap#supported_version() "{{{
+    return v:version > 703 || v:version == 703 && has('patch32')
+endfunction "}}}
+
+" }}}
+
+" Implementation {{{
+
+function s:SID() "{{{
+    return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+endfunction "}}}
+let s:SID_PREFIX = s:SID()
+delfunc s:SID
+
+function! s:local_func(name) "{{{
+    return function('<SNR>' . s:SID_PREFIX . '_' . a:name)
+endfunction "}}}
+
+
 
 function! s:save_map(is_abbr, mode, ...) "{{{
     if !savemap#supported_version()
@@ -52,14 +73,25 @@ function! s:save_map(is_abbr, mode, ...) "{{{
     return map_dict
 endfunction "}}}
 
-function s:SID() "{{{
-    return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
+function! s:MapDict_restore_a_map() dict "{{{
+    call s:restore_map_info(self.__map_info.normal, self.__is_abbr)
+    call s:restore_map_info(self.__map_info.buffer, self.__is_abbr)
 endfunction "}}}
-let s:SID_PREFIX = s:SID()
-delfunc s:SID
 
-function! s:local_func(name) "{{{
-    return function('<SNR>' . s:SID_PREFIX . '_' . a:name)
+function! s:MapDict_restore_mappings() dict "{{{
+    for d in self.__map_info
+        call s:restore_map_info(d.normal, self.__is_abbr)
+        call s:restore_map_info(d.buffer, self.__is_abbr)
+    endfor
+endfunction "}}}
+
+function! s:get_all_lhs(mode, ...) "{{{
+    redir => output
+    silent execute a:mode.'map' join(a:000)
+    redir END
+
+    let pat = '^.\s\+\(\S\+\)'
+    return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'empty(v:val)')
 endfunction "}}}
 
 function! s:get_map_info(mode, lhs, is_abbr) "{{{
@@ -102,44 +134,24 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
     if empty(a:map_info)
         return
     endif
-    for mode in s:each_modes(a:map_info.mode)
+    for mode in s:split_maparg_modes(a:map_info.mode)
         execute
         \   mode . (a:map_info.noremap ? 'nore' : '')
         \       . (a:is_abbr ? 'abbr' : 'map')
-        \   s:convert_options(a:map_info)
+        \   s:convert_maparg_options(a:map_info)
         \   a:map_info.lhs
         \   a:map_info.rhs
     endfor
 endfunction "}}}
 
-" MapDict {{{
-function! s:MapDict_restore_a_map() dict "{{{
-    call s:restore_map_info(self.__map_info.normal, self.__is_abbr)
-    call s:restore_map_info(self.__map_info.buffer, self.__is_abbr)
+function! s:convert_maparg_options(maparg) "{{{
+    return join(map(
+    \   ['silent', 'expr', 'buffer'],
+    \   'a:maparg[v:val] ? "<" . v:val . ">" : ""'
+    \), '')
 endfunction "}}}
 
-function! s:MapDict_restore_mappings() dict "{{{
-    for d in self.__map_info
-        call s:restore_map_info(d.normal, self.__is_abbr)
-        call s:restore_map_info(d.buffer, self.__is_abbr)
-    endfor
-endfunction "}}}
-" }}}
-
-function! savemap#supported_version() "{{{
-    return v:version > 703 || v:version == 703 && has('patch32')
-endfunction "}}}
-
-function! s:get_all_lhs(mode, ...) "{{{
-    redir => output
-    silent execute a:mode.'map' join(a:000)
-    redir END
-
-    let pat = '^.\s\+\(\S\+\)'
-    return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'empty(v:val)')
-endfunction "}}}
-
-function! s:each_modes(modes) "{{{
+function! s:split_maparg_modes(modes) "{{{
     let h = {}
     for _ in split(a:modes, '\zs')
         if _ ==# ' '
@@ -156,13 +168,7 @@ function! s:each_modes(modes) "{{{
     return keys(h)
 endfunction "}}}
 
-function! s:convert_options(maparg) "{{{
-    return join(map(
-    \   ['silent', 'expr', 'buffer'],
-    \   'a:maparg[v:val] ? "<" . v:val . ">" : ""'
-    \), '')
-endfunction "}}}
-
+" }}}
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
