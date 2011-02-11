@@ -66,21 +66,21 @@ function! s:save_map(is_abbr, arg, ...) "{{{
                 let map_info =
                 \   s:get_map_info(mode, lhs, a:is_abbr)
                 if s:match_map_info_string(
-                \       map_info, options, 'lhs')
+                \       map_info, 'lhs', options, 'lhs')
                 \   && s:match_map_info_regexp(
-                \           map_info, options, 'lhs-regexp')
+                \           map_info, 'lhs', options, 'lhs-regexp')
                 \   && s:match_map_info_string(
-                \           map_info, options, 'rhs')
+                \           map_info, 'rhs', options, 'rhs')
                 \   && s:match_map_info_regexp(
-                \           map_info, options, 'rhs-regexp')
+                \           map_info, 'rhs', options, 'rhs-regexp')
                 \   && s:match_map_info_bool(
-                \           map_info, options, 'silent')
+                \           map_info, 'silent', options, 'silent')
                 \   && s:match_map_info_bool(
-                \           map_info, options, 'noremap')
+                \           map_info, 'noremap', options, 'noremap')
                 \   && s:match_map_info_bool(
-                \           map_info, options, 'expr')
+                \           map_info, 'expr', options, 'expr')
                 \   && s:match_map_info_bool(
-                \           map_info, options, 'buffer')
+                \           map_info, 'buffer', options, 'buffer')
                     if has_key(options, 'buffer')
                         " Remove unmatched mapping.
                         let map_info[options.buffer ? 'normal' : 'buffer'] = {}
@@ -191,34 +191,37 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
     endfor
 endfunction "}}}
 
-function! s:match_map_info_regexp(map_info, options, name) "{{{
+function! s:match_map_info_regexp(map_info, map_info_name, options, option_name) "{{{
     return s:match_map_info_compare(
-    \   a:map_info, a:options, a:name,
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
     \   function('s:compare_map_info_regexp'))
 endfunction "}}}
 function! s:compare_map_info_regexp(map_info, option) "{{{
     return a:map_info =~# a:option
 endfunction "}}}
 
-function! s:match_map_info_string(map_info, options, name) "{{{
+function! s:match_map_info_string(map_info, map_info_name, options, option_name) "{{{
     return s:match_map_info_compare(
-    \   a:map_info, a:options, a:name,
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
     \   function('s:compare_map_info_string'))
 endfunction "}}}
 function! s:compare_map_info_string(map_info, option) "{{{
     return a:map_info ==# a:option
 endfunction "}}}
 
-function! s:match_map_info_bool(map_info, options, name) "{{{
+function! s:match_map_info_bool(map_info, map_info_name, options, option_name) "{{{
     return s:match_map_info_compare(
-    \   a:map_info, a:options, a:name,
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
     \   function('s:compare_map_info_bool'))
 endfunction "}}}
 function! s:compare_map_info_bool(map_info, option) "{{{
     return !!a:map_info == !!a:option
 endfunction "}}}
 
-function! s:match_map_info_compare(map_info, options, name, compare) "{{{
+function! s:match_map_info_compare(map_info, map_info_name, options, option_name, compare) "{{{
     " When a:options.buffer was given and 1,
     " check only <buffer> mapping.
     " When a:options.buffer was given and 0,
@@ -226,25 +229,25 @@ function! s:match_map_info_compare(map_info, options, name, compare) "{{{
     " When a:options.buffer was not given,
     " check both <buffer and non-<buffer> mappings.
 
-    if !has_key(a:options, a:name)
+    if !has_key(a:options, a:option_name)
         return 1
     endif
 
-    if a:name ==# 'buffer'
+    if a:map_info_name ==# 'buffer'
         return !empty(a:map_info[a:options.buffer ? 'buffer' : 'normal'])
     else
         let match_buffer =
         \   (!has_key(a:options, 'buffer') || a:options.buffer)
-        \   && has_key(a:map_info.buffer, a:name)
+        \   && has_key(a:map_info.buffer, a:map_info_name)
         \   && a:compare(
-        \       a:map_info.buffer[a:name],
-        \       a:options[a:name])
+        \       a:map_info.buffer[a:map_info_name],
+        \       a:options[a:option_name])
         let match_normal =
         \   (!has_key(a:options, 'buffer') || !a:options.buffer)
-        \   && has_key(a:map_info.normal, a:name)
+        \   && has_key(a:map_info.normal, a:map_info_name)
         \   && a:compare(
-        \       a:map_info.normal[a:name],
-        \       a:options[a:name])
+        \       a:map_info.normal[a:map_info_name],
+        \       a:options[a:option_name])
 
         let BOTH = 0
         let BUFFER = 1
