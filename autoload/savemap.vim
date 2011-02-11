@@ -62,7 +62,7 @@ function! s:save_map(is_abbr, mode, ...) "{{{
     else
         let map_dict.restore = s:local_func('MapDict_restore_mappings')
         let map_dict.__map_info = []
-        for lhs in s:get_all_lhs(a:mode)
+        for lhs in s:get_all_lhs(a:mode, a:is_abbr)
             call add(
             \   map_dict.__map_info,
             \   s:get_map_info(a:mode, lhs, a:is_abbr)
@@ -85,9 +85,9 @@ function! s:MapDict_restore_mappings() dict "{{{
     endfor
 endfunction "}}}
 
-function! s:get_all_lhs(mode, ...) "{{{
+function! s:get_all_lhs(mode, is_abbr) "{{{
     redir => output
-    silent execute a:mode.'map' join(a:000)
+    silent execute a:mode . (a:is_abbr ? 'abbr' : 'map')
     redir END
 
     let pat = '^.\s\+\(\S\+\)'
