@@ -12,7 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 5))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 6))
 
 " Interface {{{
 
@@ -61,7 +61,35 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     if a:0 == 0 && type(a:arg) == type({})
         " {options}
         let options = a:arg
-        " TODO
+        for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
+            for lhs in s:get_all_lhs(mode, a:is_abbr)
+                let map_info =
+                \   s:get_map_info(mode, lhs, a:is_abbr)
+                if s:match_map_info_string(
+                \       map_info, 'lhs', options, 'lhs')
+                \   && s:match_map_info_regexp(
+                \           map_info, 'lhs', options, 'lhs-regexp')
+                \   && s:match_map_info_string(
+                \           map_info, 'rhs', options, 'rhs')
+                \   && s:match_map_info_regexp(
+                \           map_info, 'rhs', options, 'rhs-regexp')
+                \   && s:match_map_info_bool(
+                \           map_info, 'silent', options, 'silent')
+                \   && s:match_map_info_bool(
+                \           map_info, 'noremap', options, 'noremap')
+                \   && s:match_map_info_bool(
+                \           map_info, 'expr', options, 'expr')
+                \   && s:match_map_info_bool(
+                \           map_info, 'buffer', options, 'buffer')
+                    if has_key(options, 'buffer')
+                        " Remove unmatched mapping.
+                        let map_info[options.buffer ? 'normal' : 'buffer'] = {}
+                        " Assert !empty(map_info[options.buffer ? 'buffer' : 'normal'])
+                    endif
+                    call add(map_dict.__map_info, map_info)
+                endif
+            endfor
+        endfor
     elseif type(a:arg) == type("")
     \   && a:0 == 1
     \   && type(a:1) == type("")
@@ -101,8 +129,16 @@ function! s:get_all_lhs(mode, is_abbr) "{{{
     silent execute a:mode . (a:is_abbr ? 'abbr' : 'map')
     redir END
 
-    let pat = '^.\s\+\zs\S\+'
-    return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'v:val != ""')
+    let r = []
+    let uniq = {}
+    for l in split(output, '\n')
+        let m = matchstr(l, '^.\s\+\zs\S\+')
+        if m != '' && !has_key(uniq, m)
+            call add(r, m)
+            let uniq[m] = 1
+        endif
+    endfor
+    return r
 endfunction "}}}
 
 function! s:get_map_info(mode, lhs, is_abbr) "{{{
@@ -153,6 +189,78 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
         \   a:map_info.lhs
         \   a:map_info.rhs
     endfor
+endfunction "}}}
+
+function! s:match_map_info_regexp(map_info, map_info_name, options, option_name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
+    \   function('s:compare_map_info_regexp'))
+endfunction "}}}
+function! s:compare_map_info_regexp(map_info, option) "{{{
+    return a:map_info =~# a:option
+endfunction "}}}
+
+function! s:match_map_info_string(map_info, map_info_name, options, option_name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
+    \   function('s:compare_map_info_string'))
+endfunction "}}}
+function! s:compare_map_info_string(map_info, option) "{{{
+    return a:map_info ==# a:option
+endfunction "}}}
+
+function! s:match_map_info_bool(map_info, map_info_name, options, option_name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:map_info_name,
+    \   a:options, a:option_name,
+    \   function('s:compare_map_info_bool'))
+endfunction "}}}
+function! s:compare_map_info_bool(map_info, option) "{{{
+    return !!a:map_info == !!a:option
+endfunction "}}}
+
+function! s:match_map_info_compare(map_info, map_info_name, options, option_name, compare) "{{{
+    " When a:options.buffer was given and 1,
+    " check only <buffer> mapping.
+    " When a:options.buffer was given and 0,
+    " check only non-<buffer> mapping.
+    " When a:options.buffer was not given,
+    " check both <buffer and non-<buffer> mappings.
+
+    if !has_key(a:options, a:option_name)
+        return 1
+    endif
+
+    if a:map_info_name ==# 'buffer'
+        return !empty(a:map_info[a:options.buffer ? 'buffer' : 'normal'])
+    else
+        let match_buffer =
+        \   (!has_key(a:options, 'buffer') || a:options.buffer)
+        \   && has_key(a:map_info.buffer, a:map_info_name)
+        \   && a:compare(
+        \       a:map_info.buffer[a:map_info_name],
+        \       a:options[a:option_name])
+        let match_normal =
+        \   (!has_key(a:options, 'buffer') || !a:options.buffer)
+        \   && has_key(a:map_info.normal, a:map_info_name)
+        \   && a:compare(
+        \       a:map_info.normal[a:map_info_name],
+        \       a:options[a:option_name])
+
+        let BOTH = 0
+        let BUFFER = 1
+        let NORMAL = 2
+        let check =
+        \   !has_key(a:options, 'buffer') ? BOTH
+        \   : a:options.buffer ? BUFFER
+        \   : NORMAL
+
+        return check ==# BOTH ? match_buffer || match_normal
+        \   :  check ==# BUFFER ? match_buffer
+        \   :  match_normal
+    endif
 endfunction "}}}
 
 function! s:convert_maparg_options(maparg) "{{{
