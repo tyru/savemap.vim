@@ -17,7 +17,7 @@ endfunction "}}}
 
 function! s:run()
     if !savemap#supported_version()
-        return
+        Skip "your Vim does not support maparg()'s 4th argument."
     endif
 
     nmapclear
