@@ -63,10 +63,17 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         let options = a:arg
         for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
             for lhs in s:get_all_lhs(mode, a:is_abbr)
-                if (!has_key(options, 'lhs')
+                let match_lhs =
+                \   (!has_key(options, 'lhs')
                 \       || options.lhs ==# lhs)
                 \   || (!has_key(options, 'lhs-regexp')
                 \       || lhs =~# options['lhs-regexp'])
+                let match_rhs =
+                \   (!has_key(options, 'rhs')
+                \       || options.rhs ==# rhs)
+                \   || (!has_key(options, 'rhs-regexp')
+                \       || rhs =~# options['rhs-regexp'])
+                if match_lhs && match_rhs
                     call add(
                     \   map_dict.__map_info,
                     \   s:get_map_info(mode, lhs, a:is_abbr)

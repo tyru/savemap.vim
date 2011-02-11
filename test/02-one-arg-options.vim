@@ -34,9 +34,15 @@ function! s:run()
     let normal_mappings = savemap#save_map({'mode': 'n'})
     let dup = savemap#save_map({'mode': 'n', 'lhs': 'dup'})
     let visual_mappings = savemap#save_map({'mode': 'v'})
+
     let vi = savemap#save_map({'mode': 'v', 'lhs-regexp': '^vi'})
     IsDeeply visual_mappings, vi
     unlet vi
+
+    let all   = savemap#save_map({'mode': 'nv'})
+    let dummy = savemap#save_map({'mode': 'nv', 'rhs-regexp': '^dummy$'})
+    IsDeeply all, dummy
+    unlet all dummy
 
     nmapclear
     nmapclear <buffer>
