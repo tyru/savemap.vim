@@ -73,11 +73,25 @@ function! s:save_map(is_abbr, arg, ...) "{{{
                 \       || options.rhs ==# rhs)
                 \   || (!has_key(options, 'rhs-regexp')
                 \       || rhs =~# options['rhs-regexp'])
-                if match_lhs && match_rhs
-                    call add(
-                    \   map_dict.__map_info,
-                    \   s:get_map_info(mode, lhs, a:is_abbr)
-                    \)
+                let map_info =
+                \   s:get_map_info(mode, lhs, a:is_abbr)
+
+                if match_lhs
+                \   && match_rhs
+                \   && s:match_map_info_option(
+                \           map_info, options, 'silent')
+                \   && s:match_map_info_option(
+                \           map_info, options, 'noremap')
+                \   && s:match_map_info_option(
+                \           map_info, options, 'expr')
+                \   && s:match_map_info_option(
+                \           map_info, options, 'buffer')
+                    if has_key(options, 'buffer')
+                        " Remove unmatched mapping.
+                        let map_info[options.buffer ? 'normal' : 'buffer'] = {}
+                        " Assert !empty(map_info[options.buffer ? 'buffer' : 'normal'])
+                    endif
+                    call add(map_dict.__map_info, map_info)
                 endif
             endfor
         endfor
@@ -180,6 +194,33 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
         \   a:map_info.lhs
         \   a:map_info.rhs
     endfor
+endfunction "}}}
+
+function! s:match_map_info_option(map_info, options, name) "{{{
+    " When a:options.buffer was given and 1,
+    " check only <buffer> mapping.
+    " When a:options.buffer was given and 0,
+    " check only non-<buffer> mapping.
+    " When a:options.buffer was not given,
+    " check both <buffer and non-<buffer> mappings.
+
+    if !has_key(a:options, a:name)
+        return 1
+    endif
+
+    if a:name ==# 'buffer'
+        return !empty(a:map_info[a:options.buffer ? 'buffer' : 'normal'])
+    else
+        let match_buffer =
+        \   (!has_key(a:options, 'buffer') || a:options.buffer)
+        \   && has_key(a:map_info.buffer, a:name)
+        \   && !!a:map_info.buffer[a:name] == !!a:options[a:name]
+        let match_normal =
+        \   (!has_key(a:options, 'buffer') || !a:options.buffer)
+        \   && has_key(a:map_info.normal, a:name)
+        \   && !!a:map_info.normal[a:name] == !!a:options[a:name]
+        return match_buffer && match_normal
+    endif
 endfunction "}}}
 
 function! s:convert_maparg_options(maparg) "{{{
