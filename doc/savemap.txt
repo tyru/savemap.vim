@@ -176,8 +176,6 @@ Savemap.restore()
 	which the object is holding.
 
 Savemap.has_abbr()
-	(TODO)
-
 	Return boolean value that means whether
 	the object holds abbreviations or mappings.
 
