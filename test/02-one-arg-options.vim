@@ -37,9 +37,7 @@ function! s:run()
     let dup_non_buffer = savemap#save_map({'mode': 'n', 'lhs': 'dup', 'buffer': 0})
     let visual_mappings = savemap#save_map({'mode': 'v'})
 
-    let vi = savemap#save_map({'mode': 'v', 'lhs-regexp': '^vi'})
-    IsDeeply vi, visual_mappings
-    unlet vi
+    IsDeeply savemap#save_map({'mode': 'v', 'lhs-regexp': '^vi'}), visual_mappings
 
     let all   = savemap#save_map({'mode': 'nv'})
     let dummy = savemap#save_map({'mode': 'nv', 'rhs-regexp': '^dummy$'})
