@@ -2,7 +2,7 @@
 
 Author:
   tyru <tyru.exe@gmail.com>
-Version: 0.0.0
+Version: 0.2.0
 " NEW BSD LICENSE {{{
 "   Copyright (c) 2009, tyru
 "   All rights reserved.
@@ -211,6 +211,23 @@ CHANGELOG						*savemap-changelog* {{{
 
 0.0.0:
 - Initial upload
+0.2.0:
+- change the specification of |savemap#save_map()|, |savemap#save_abbr()|.
+	- Even if {lhs} was omitted, Returns |Dictionary| not |List|.
+- fix the bug ignoring a non-<buffer> mapping when a <buffer> mapping exists with same lhs-es.
+- improve |savemap#save_map()| and |savemap#save_abbr()|.
+	- you can filter mappings you want by following conditions:
+		- lhs (literaly, regexp)
+		- rhs (literaly, regexp)
+		- <silent>
+		- remap
+		- <expr>
+		- <buffer>
+		- modes
+- add some methods of the return value of
+  |savemap#save_map()| and |savemap#save_abbr()|.
+	- see |savemap-restore-object| for details.
+- change the license.
 
 }}}
 ==============================================================================
