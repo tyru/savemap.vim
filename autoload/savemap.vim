@@ -78,13 +78,13 @@ function! s:save_map(is_abbr, arg, ...) "{{{
 
                 if match_lhs
                 \   && match_rhs
-                \   && s:match_map_info_option(
+                \   && s:match_map_info_bool(
                 \           map_info, options, 'silent')
-                \   && s:match_map_info_option(
+                \   && s:match_map_info_bool(
                 \           map_info, options, 'noremap')
-                \   && s:match_map_info_option(
+                \   && s:match_map_info_bool(
                 \           map_info, options, 'expr')
-                \   && s:match_map_info_option(
+                \   && s:match_map_info_bool(
                 \           map_info, options, 'buffer')
                     if has_key(options, 'buffer')
                         " Remove unmatched mapping.
@@ -196,7 +196,7 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
     endfor
 endfunction "}}}
 
-function! s:match_map_info_option(map_info, options, name) "{{{
+function! s:match_map_info_bool(map_info, options, name) "{{{
     " When a:options.buffer was given and 1,
     " check only <buffer> mapping.
     " When a:options.buffer was given and 0,
