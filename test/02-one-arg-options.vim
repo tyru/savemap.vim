@@ -38,7 +38,7 @@ function! s:run()
     let visual_mappings = savemap#save_map({'mode': 'v'})
 
     let vi = savemap#save_map({'mode': 'v', 'lhs-regexp': '^vi'})
-    IsDeeply visual_mappings, vi
+    IsDeeply vi, visual_mappings
     unlet vi
 
     let all   = savemap#save_map({'mode': 'nv'})
@@ -103,6 +103,7 @@ function! s:run()
     vmapclear
     vmapclear <buffer>
     Is maparg('foo', 'n', 0), '', 'foo does not exist'
+    Is maparg('bar', 'n', 0), '', 'bar does exist'
     call normal_mappings.restore()
     Is maparg('foo', 'n', 0), 'dummy', 'foo does exist'
     Is maparg('bar', 'n', 0), 'dummy', 'bar does exist'
