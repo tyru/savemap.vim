@@ -44,12 +44,11 @@ function! s:run()
     IsDeeply all, dummy
     unlet all dummy
 
+    " dup
     nmapclear
     nmapclear <buffer>
     vmapclear
     vmapclear <buffer>
-
-    " dup
     Is maparg('dup', 'n', 0), '', 'dup does not exist'
     call dup.restore()
     Is maparg('dup', 'n', 0), 'dummy', 'dup does exist'
@@ -63,6 +62,10 @@ function! s:run()
     Is get(maparg('dup', 'n', 0, 1), 'buffer', -1), 0, 'dup is not <buffer> but exists'
 
     " normal_mappings
+    nmapclear
+    nmapclear <buffer>
+    vmapclear
+    vmapclear <buffer>
     Is maparg('foo', 'n', 0), '', 'foo does not exist'
     call normal_mappings.restore()
     Is maparg('foo', 'n', 0), 'dummy', 'foo does exist'
@@ -72,6 +75,8 @@ function! s:run()
     " visual_mappings
     nmapclear
     nmapclear <buffer>
+    vmapclear
+    vmapclear <buffer>
     Is maparg('foo', 'n', 0), '', 'foo does not exist'
     call visual_mappings.restore()
     Is maparg('foo', 'n', 0), '', 'foo does not exist'
