@@ -101,8 +101,8 @@ function! s:get_all_lhs(mode, is_abbr) "{{{
     silent execute a:mode . (a:is_abbr ? 'abbr' : 'map')
     redir END
 
-    let pat = '^.\s\+\(\S\+\)'
-    return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'empty(v:val)')
+    let pat = '^.\s\+\zs\S\+'
+    return filter(map(split(output, '\n'), 'matchstr(v:val, pat)'), 'v:val != ""')
 endfunction "}}}
 
 function! s:get_map_info(mode, lhs, is_abbr) "{{{
