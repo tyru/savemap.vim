@@ -11,6 +11,7 @@ CONTENTS						*savemap-contents*
 Introduction		|savemap-introduction|
 Interface			|savemap-interface|
   Functions			|savemap-functions|
+Restore Object		|savemap-restore-object|
 TODO				|savemap-todo|
 Changelog			|savemap-changelog|
 
@@ -80,6 +81,7 @@ savemap#save_map({options})          or
 savemap#save_map({options1} [, {options2} ...])
 	Return non-empty |Dictionary| which has .restore() method
 	to restore the mapping.
+	See |savemap-restore-object| for the details.
 
 	In the 1st form, if {lhs} was omitted,
 	.restore() will restore all mappings in {mode}.
@@ -165,6 +167,36 @@ savemap#supported_version()				*savemap#supported_version()*
 	Return non-zero if Vim supported the 4th argument of |maparg()|.
 
 }}}
+}}}
+==============================================================================
+RESTORE OBJECT				*savemap-restore-object* {{{
+
+Savemap.restore()
+	Restore the mappings
+	which the object is holding.
+
+Savemap.has_abbr()
+	(TODO)
+
+	Return boolean value that means whether
+	the object holds abbreviations or mappings.
+
+Savemap.get_map_info()
+	(TODO)
+
+	Return |List| which means mappings which the object holds.
+	The |List| has mappings info as its elements.
+	the structure of mappings info is: >
+		{
+			"buffer": {map-info},
+			"normal": {map-info},
+		}
+<	{map-info} can be a empty dictionary
+	when the mapping is not found.
+	Or if the mapping is the found,
+	{map-info}'s structure is same as |maparg()|'s dictionary
+	which can be obtained when {dict} is non-zero.
+
 }}}
 ==============================================================================
 TODO						*savemap-todo* {{{
