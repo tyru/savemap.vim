@@ -63,21 +63,16 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         let options = a:arg
         for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
             for lhs in s:get_all_lhs(mode, a:is_abbr)
-                let match_lhs =
-                \   (!has_key(options, 'lhs')
-                \       || options.lhs ==# lhs)
-                \   || (!has_key(options, 'lhs-regexp')
-                \       || lhs =~# options['lhs-regexp'])
-                let match_rhs =
-                \   (!has_key(options, 'rhs')
-                \       || options.rhs ==# rhs)
-                \   || (!has_key(options, 'rhs-regexp')
-                \       || rhs =~# options['rhs-regexp'])
                 let map_info =
                 \   s:get_map_info(mode, lhs, a:is_abbr)
-
-                if match_lhs
-                \   && match_rhs
+                if s:match_map_info_string(
+                \       map_info, options, 'lhs')
+                \   && s:match_map_info_regexp(
+                \           map_info, options, 'lhs-regexp')
+                \   && s:match_map_info_string(
+                \           map_info, options, 'rhs')
+                \   && s:match_map_info_regexp(
+                \           map_info, options, 'rhs-regexp')
                 \   && s:match_map_info_bool(
                 \           map_info, options, 'silent')
                 \   && s:match_map_info_bool(
@@ -196,7 +191,34 @@ function! s:restore_map_info(map_info, is_abbr) "{{{
     endfor
 endfunction "}}}
 
+function! s:match_map_info_regexp(map_info, options, name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:options, a:name,
+    \   function('s:compare_map_info_regexp'))
+endfunction "}}}
+function! s:compare_map_info_regexp(map_info, option) "{{{
+    return a:map_info =~# a:option
+endfunction "}}}
+
+function! s:match_map_info_string(map_info, options, name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:options, a:name,
+    \   function('s:compare_map_info_string'))
+endfunction "}}}
+function! s:compare_map_info_string(map_info, option) "{{{
+    return a:map_info ==# a:option
+endfunction "}}}
+
 function! s:match_map_info_bool(map_info, options, name) "{{{
+    return s:match_map_info_compare(
+    \   a:map_info, a:options, a:name,
+    \   function('s:compare_map_info_bool'))
+endfunction "}}}
+function! s:compare_map_info_bool(map_info, option) "{{{
+    return !!a:map_info == !!a:option
+endfunction "}}}
+
+function! s:match_map_info_compare(map_info, options, name, compare) "{{{
     " When a:options.buffer was given and 1,
     " check only <buffer> mapping.
     " When a:options.buffer was given and 0,
@@ -214,12 +236,27 @@ function! s:match_map_info_bool(map_info, options, name) "{{{
         let match_buffer =
         \   (!has_key(a:options, 'buffer') || a:options.buffer)
         \   && has_key(a:map_info.buffer, a:name)
-        \   && !!a:map_info.buffer[a:name] == !!a:options[a:name]
+        \   && a:compare(
+        \       a:map_info.buffer[a:name],
+        \       a:options[a:name])
         let match_normal =
         \   (!has_key(a:options, 'buffer') || !a:options.buffer)
         \   && has_key(a:map_info.normal, a:name)
-        \   && !!a:map_info.normal[a:name] == !!a:options[a:name]
-        return match_buffer && match_normal
+        \   && a:compare(
+        \       a:map_info.normal[a:name],
+        \       a:options[a:name])
+
+        let BOTH = 0
+        let BUFFER = 1
+        let NORMAL = 2
+        let check =
+        \   !has_key(a:options, 'buffer') ? BOTH
+        \   : a:options.buffer ? BUFFER
+        \   : NORMAL
+
+        return check ==# BOTH ? match_buffer || match_normal
+        \   :  check ==# BUFFER ? match_buffer
+        \   :  match_normal
     endif
 endfunction "}}}
 
