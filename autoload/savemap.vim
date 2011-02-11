@@ -53,11 +53,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         return {}
     endif
 
-    let map_dict = {
-    \   '__is_abbr': a:is_abbr,
-    \   'restore': s:local_func('MapDict_restore_mappings'),
-    \   '__map_info': [],
-    \}
+    let map_dict = s:MapDict_new(a:is_abbr)
     if a:0 == 0 && type(a:arg) == type({})
         " {options}
         let options = a:arg
@@ -86,7 +82,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
                         let map_info[options.buffer ? 'normal' : 'buffer'] = {}
                         " Assert !empty(map_info[options.buffer ? 'buffer' : 'normal'])
                     endif
-                    call add(map_dict.__map_info, map_info)
+                    call map_dict.add_map_info(map_info)
                 endif
             endfor
         endfor
@@ -95,8 +91,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     \   && type(a:1) == type("")
         " {mode}, {lhs}
         let [mode, lhs] = [a:arg, a:1]
-        call add(
-        \   map_dict.__map_info,
+        call map_dict.add_map_info(
         \   s:get_map_info(mode, lhs, a:is_abbr)
         \)
     elseif type(a:arg) == type("")
@@ -104,8 +99,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         " {mode}
         let mode = a:arg
         for lhs in s:get_all_lhs(mode, a:is_abbr)
-            call add(
-            \   map_dict.__map_info,
+            call map_dict.add_map_info(
             \   s:get_map_info(mode, lhs, a:is_abbr)
             \)
         endfor
@@ -117,11 +111,24 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     return map_dict
 endfunction "}}}
 
-function! s:MapDict_restore_mappings() dict "{{{
+function! s:MapDict_new(is_abbr) "{{{
+    let obj = {}
+    let obj.__is_abbr = a:is_abbr
+    let obj.__map_info = []
+    let obj.restore = s:local_func('MapDict_restore')
+    let obj.add_map_info = s:local_func('MapDict_add_map_info')
+    return obj
+endfunction "}}}
+
+function! s:MapDict_restore() dict "{{{
     for d in self.__map_info
         call s:restore_map_info(d.normal, self.__is_abbr)
         call s:restore_map_info(d.buffer, self.__is_abbr)
     endfor
+endfunction "}}}
+
+function! s:MapDict_add_map_info(map_info) dict "{{{
+    call add(self.__map_info, a:map_info)
 endfunction "}}}
 
 function! s:get_all_lhs(mode, is_abbr) "{{{
