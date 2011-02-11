@@ -12,7 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 5))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 1, 6))
 
 " Interface {{{
 
@@ -61,7 +61,16 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     if a:0 == 0 && type(a:arg) == type({})
         " {options}
         let options = a:arg
-        " TODO
+        for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
+            for lhs in s:get_all_lhs(mode, a:is_abbr)
+                if !has_key(options, 'lhs') || options.lhs ==# lhs
+                    call add(
+                    \   map_dict.__map_info,
+                    \   s:get_map_info(mode, lhs, a:is_abbr)
+                    \)
+                endif
+            endfor
+        endfor
     elseif type(a:arg) == type("")
     \   && a:0 == 1
     \   && type(a:1) == type("")
