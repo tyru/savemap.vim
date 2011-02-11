@@ -171,15 +171,15 @@ savemap#supported_version()				*savemap#supported_version()*
 ==============================================================================
 RESTORE OBJECT				*savemap-restore-object* {{{
 
-Savemap.restore()
+Savemap.restore()		*Savemap.restore()*
 	Restore the mappings
 	which the object is holding.
 
-Savemap.has_abbr()
+Savemap.has_abbr()		*Savemap.has_abbr()*
 	Return boolean value that means whether
 	the object holds abbreviations or mappings.
 
-Savemap.get_map_info()
+Savemap.get_map_info()		*Savemap.get_map_info()*
 	(TODO)
 
 	Return |List| which means mappings which the object holds.
