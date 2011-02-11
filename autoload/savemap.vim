@@ -118,6 +118,7 @@ function! s:MapDict_new(is_abbr) "{{{
     let obj.restore = s:local_func('MapDict_restore')
     let obj.add_map_info = s:local_func('MapDict_add_map_info')
     let obj.has_abbr = s:local_func('MapDict_has_abbr')
+    let obj.get_map_info = s:local_func('MapDict_get_map_info')
     return obj
 endfunction "}}}
 
@@ -134,6 +135,10 @@ endfunction "}}}
 
 function! s:MapDict_has_abbr() dict "{{{
     return self.__is_abbr
+endfunction "}}}
+
+function! s:MapDict_get_map_info() dict "{{{
+    return self.__map_info
 endfunction "}}}
 
 function! s:get_all_lhs(mode, is_abbr) "{{{
