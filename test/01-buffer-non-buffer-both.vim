@@ -7,6 +7,22 @@ set cpo&vim
 " }}}
 
 
+function! s:is_buffer(lhs, name)
+    return s:check_buffer(a:lhs, a:name, 1)
+endfunction
+function! s:is_not_buffer(lhs, name)
+    return s:check_buffer(a:lhs, a:name, 0)
+endfunction
+function! s:check_buffer(lhs, name, is_buffer)
+    let m = maparg(a:lhs, 'n', 0, 1)
+    let has_buffer = has_key(m, 'buffer')
+    Ok has_buffer, a:name . " - " . a:lhs . " has key 'buffer'."
+    if !has_buffer
+        return
+    endif
+    Ok (a:is_buffer ? m.buffer : !m.buffer), a:name . " - '" . a:lhs . "' " . (a:is_buffer ? "is" : "is not") . " <buffer>."
+endfunction
+
 function! s:run()
     if !savemap#supported_version()
         echoerr "your platform does not support the 4th arg of maparg()."
@@ -28,22 +44,6 @@ function! s:run()
     nmapclear
     nmapclear <buffer>
 
-
-    function! s:is_buffer(lhs, name)
-        return s:check_buffer(a:lhs, a:name, 1)
-    endfunction
-    function! s:is_not_buffer(lhs, name)
-        return s:check_buffer(a:lhs, a:name, 0)
-    endfunction
-    function! s:check_buffer(lhs, name, is_buffer)
-        let m = maparg(a:lhs, 'n', 0, 1)
-        let has_buffer = has_key(m, 'buffer')
-        Ok has_buffer, a:name . " - " . a:lhs . " has key 'buffer'."
-        if !has_buffer
-            return
-        endif
-        Ok (a:is_buffer ? m.buffer : !m.buffer), a:name . " - '" . a:lhs . "' " . (a:is_buffer ? "is" : "is not") . " <buffer>."
-    endfunction
 
     Diag '--- normal ---'
     call normal.restore()
