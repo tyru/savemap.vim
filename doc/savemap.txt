@@ -89,18 +89,22 @@ savemap#save_map({options1} [, {options2} ...])
 	{options} is a |Dictionary| like the following:
 		"lhs"
 			The {lhs} of the mapping.
+
+			NOTE: You cannot specify both of "lhs-regexp"
+			and "lhs", or both of "rhs", "rhs-regexp"
+			altogether.
+			It is undefined behavior.
+			But you can specify "lhs" or "lhs-regexp"
+			with "rhs" or "rhs-regexp" altogether.
+			you will get mappings object holding
+			the mappings matching with "lhs" or
+			"lhs-regexp" __AND__ "rhs" or "rhs-regexp".
 		"rhs"
 			The {rhs} of the mapping as typed.
 		"lhs-regexp"
 			(TODO)
-			NOTE: You cannot specify this option
-			with "lhs" altogether.
-			It is undefined behavior.
 		"rhs-regexp"
 			(TODO)
-			NOTE: You cannot specify this option
-			with "lhs" altogether.
-			It is undefined behavior.
 		"silent"
 			non-zero for a |:map-silent| mapping.
 			zero for a non-|:map-silent| mapping.
