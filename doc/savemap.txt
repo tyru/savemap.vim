@@ -93,8 +93,14 @@ savemap#save_map({options1} [, {options2} ...])
 			The {rhs} of the mapping as typed.
 		"lhs-regexp"
 			(TODO)
+			NOTE: You cannot specify this option
+			with "lhs" altogether.
+			It is undefined behavior.
 		"rhs-regexp"
 			(TODO)
+			NOTE: You cannot specify this option
+			with "lhs" altogether.
+			It is undefined behavior.
 		"silent"
 			non-zero for a |:map-silent| mapping.
 			zero for a non-|:map-silent| mapping.
