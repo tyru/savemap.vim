@@ -33,6 +33,8 @@ function! s:run()
 
     let normal_mappings = savemap#save_map({'mode': 'n'})
     let dup = savemap#save_map({'mode': 'n', 'lhs': 'dup'})
+    let dup_buffer = savemap#save_map({'mode': 'n', 'lhs': 'dup', 'buffer': 1})
+    let dup_non_buffer = savemap#save_map({'mode': 'n', 'lhs': 'dup', 'buffer': 0})
     let visual_mappings = savemap#save_map({'mode': 'v'})
 
     let vi = savemap#save_map({'mode': 'v', 'lhs-regexp': '^vi'})
@@ -60,6 +62,40 @@ function! s:run()
         Ok 0, "can remove the <buffer> mapping 'dup'"
     endtry
     Is get(maparg('dup', 'n', 0, 1), 'buffer', -1), 0, 'dup is not <buffer> but exists'
+
+    " dup_buffer
+    nmapclear
+    nmapclear <buffer>
+    vmapclear
+    vmapclear <buffer>
+    Is maparg('dup', 'n', 0), '', 'dup does not exist'
+    call dup_buffer.restore()
+    Is maparg('dup', 'n', 0), 'dummy', 'dup does exist'
+    Is get(maparg('dup', 'n', 0, 1), 'buffer', -1), 1, 'dup is <buffer>'
+    try
+        nunmap <buffer> dup
+        Ok 1, "can remove the <buffer> mapping 'dup'"
+    catch
+        Ok 0, "can remove the <buffer> mapping 'dup'"
+    endtry
+    Is maparg('dup', 'n', 0), '', 'dup does not exist'
+
+    " dup_non_buffer
+    nmapclear
+    nmapclear <buffer>
+    vmapclear
+    vmapclear <buffer>
+    Is maparg('dup', 'n', 0), '', 'dup does not exist'
+    call dup_non_buffer.restore()
+    Is maparg('dup', 'n', 0), 'dummy', 'dup does exist'
+    Is get(maparg('dup', 'n', 0, 1), 'buffer', -1), 0, 'dup is not <buffer>'
+    try
+        nunmap dup
+        Ok 1, "can remove the <buffer> mapping 'dup'"
+    catch
+        Ok 0, "can remove the <buffer> mapping 'dup'"
+    endtry
+    Is maparg('dup', 'n', 0), '', 'dup does not exist'
 
     " normal_mappings
     nmapclear
