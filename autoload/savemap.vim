@@ -55,6 +55,8 @@ function! s:save_map(is_abbr, arg, ...) "{{{
 
     let map_dict = {
     \   '__is_abbr': a:is_abbr,
+    \   'restore': s:local_func('MapDict_restore_mappings'),
+    \   '__map_info': [],
     \}
     if a:0 == 0 && type(a:arg) == type({})
         " {options}
@@ -65,14 +67,14 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     \   && type(a:1) == type("")
         " {mode}, {lhs}
         let [mode, lhs] = [a:arg, a:1]
-        let map_dict.restore = s:local_func('MapDict_restore_a_map')
-        let map_dict.__map_info = s:get_map_info(mode, lhs, a:is_abbr)
+        call add(
+        \   map_dict.__map_info,
+        \   s:get_map_info(mode, lhs, a:is_abbr)
+        \)
     elseif type(a:arg) == type("")
     \   && a:0 == 0
         " {mode}
         let mode = a:arg
-        let map_dict.restore = s:local_func('MapDict_restore_mappings')
-        let map_dict.__map_info = []
         for lhs in s:get_all_lhs(mode, a:is_abbr)
             call add(
             \   map_dict.__map_info,
@@ -85,11 +87,6 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     endif
 
     return map_dict
-endfunction "}}}
-
-function! s:MapDict_restore_a_map() dict "{{{
-    call s:restore_map_info(self.__map_info.normal, self.__is_abbr)
-    call s:restore_map_info(self.__map_info.buffer, self.__is_abbr)
 endfunction "}}}
 
 function! s:MapDict_restore_mappings() dict "{{{
