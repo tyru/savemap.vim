@@ -54,36 +54,38 @@ function! s:save_map(is_abbr, arg, ...) "{{{
     endif
 
     let map_dict = s:MapDict_new(a:is_abbr)
-    if a:0 == 0 && type(a:arg) == type({})
+    if type(a:arg) == type({})
+    \   && filter(copy(a:000), 'type(v:val) == type({})') ==# a:000
         " {options}
-        let options = a:arg
-        for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
-            for lhs in s:get_all_lhs(mode, a:is_abbr)
-                let map_info =
-                \   s:get_map_info(mode, lhs, a:is_abbr)
-                if s:match_map_info_string(
-                \       map_info, 'lhs', options, 'lhs')
-                \   && s:match_map_info_regexp(
-                \           map_info, 'lhs', options, 'lhs-regexp')
-                \   && s:match_map_info_string(
-                \           map_info, 'rhs', options, 'rhs')
-                \   && s:match_map_info_regexp(
-                \           map_info, 'rhs', options, 'rhs-regexp')
-                \   && s:match_map_info_bool(
-                \           map_info, 'silent', options, 'silent')
-                \   && s:match_map_info_bool(
-                \           map_info, 'noremap', options, 'noremap')
-                \   && s:match_map_info_bool(
-                \           map_info, 'expr', options, 'expr')
-                \   && s:match_map_info_bool(
-                \           map_info, 'buffer', options, 'buffer')
-                    if has_key(options, 'buffer')
-                        " Remove unmatched mapping.
-                        let map_info[options.buffer ? 'normal' : 'buffer'] = {}
-                        " Assert !empty(map_info[options.buffer ? 'buffer' : 'normal'])
+        for options in [a:arg] + a:000
+            for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
+                for lhs in s:get_all_lhs(mode, a:is_abbr)
+                    let map_info =
+                    \   s:get_map_info(mode, lhs, a:is_abbr)
+                    if s:match_map_info_string(
+                    \       map_info, 'lhs', options, 'lhs')
+                    \   && s:match_map_info_regexp(
+                    \           map_info, 'lhs', options, 'lhs-regexp')
+                    \   && s:match_map_info_string(
+                    \           map_info, 'rhs', options, 'rhs')
+                    \   && s:match_map_info_regexp(
+                    \           map_info, 'rhs', options, 'rhs-regexp')
+                    \   && s:match_map_info_bool(
+                    \           map_info, 'silent', options, 'silent')
+                    \   && s:match_map_info_bool(
+                    \           map_info, 'noremap', options, 'noremap')
+                    \   && s:match_map_info_bool(
+                    \           map_info, 'expr', options, 'expr')
+                    \   && s:match_map_info_bool(
+                    \           map_info, 'buffer', options, 'buffer')
+                        if has_key(options, 'buffer')
+                            " Remove unmatched mapping.
+                            let map_info[options.buffer ? 'normal' : 'buffer'] = {}
+                            " Assert !empty(map_info[options.buffer ? 'buffer' : 'normal'])
+                        endif
+                        call map_dict.add_map_info(map_info)
                     endif
-                    call map_dict.add_map_info(map_info)
-                endif
+                endfor
             endfor
         endfor
     elseif type(a:arg) == type("")

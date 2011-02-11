@@ -152,8 +152,6 @@ savemap#save_map({options1} [, {options2} ...])
 	As you see above, this function
 	was designed like |maparg()|.
 
-	the 3rd form is TODO.
-
 	If Vim does not support the 4th argument of |maparg()|,
 	Return empty |Dictionary|.
 
