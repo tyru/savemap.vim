@@ -102,9 +102,9 @@ savemap#save_map({options1} [, {options2} ...])
 		"rhs"
 			The {rhs} of the mapping as typed.
 		"lhs-regexp"
-			(TODO)
+			The regexp of the matching mappings of lhs.
 		"rhs-regexp"
-			(TODO)
+			The regexp of the matching mappings of rhs.
 		"silent"
 			non-zero for a |:map-silent| mapping.
 			zero for a non-|:map-silent| mapping.
@@ -140,6 +140,8 @@ savemap#save_map({options1} [, {options2} ...])
 			"!"		Insert and Commandline mode
 			(|mapmode-ic|)
 		"sid"
+			(TODO)
+
 			The script local ID, used for <sid> mappings
 			(|<SID>|).
 			If the key does not exist,
