@@ -88,8 +88,7 @@ savemap#load()							*savemap#load()*
 
 									*savemap#save_map()*
 savemap#save_map({mode} [, {lhs}])   or
-savemap#save_map({options})          or
-savemap#save_map({options1} [, {options2} ...])
+savemap#save_map({options} [, {options2} ...])
 	Return non-empty |Dictionary| which has .restore() method
 	to restore the mapping.
 	See |savemap-restore-object| for the details.
@@ -168,8 +167,7 @@ savemap#save_map({options1} [, {options2} ...])
 
 								*savemap#save_abbr()*
 savemap#save_abbr({mode} [, {lhs}])   or
-savemap#save_abbr({options})          or
-savemap#save_abbr({options1} [, {options2} ...])
+savemap#save_abbr({options} [, {options2} ...])
 	|Abbreviation| version of |savemap#save_map()|.
 
 savemap#supported_version()				*savemap#supported_version()*
