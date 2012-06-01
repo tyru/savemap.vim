@@ -12,7 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 2, 2))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 2, 3))
 
 " Interface {{{
 
@@ -36,7 +36,7 @@ endfunction "}}}
 
 " Implementation {{{
 
-function s:SID() "{{{
+function! s:SID() "{{{
     return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_SID$')
 endfunction "}}}
 let s:SID_PREFIX = s:SID()
