@@ -12,7 +12,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 2, 3))
+let g:savemap#version = str2nr(printf('%02d%02d%03d', 0, 2, 4))
 
 " Interface {{{
 
