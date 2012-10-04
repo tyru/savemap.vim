@@ -61,7 +61,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
             for mode in s:split_maparg_modes(get(options, 'mode', 'nvo'))
                 for lhs in s:get_all_lhs(mode, a:is_abbr)
                     let map_info =
-                    \   s:get_map_info(mode, lhs, a:is_abbr)
+                    \   s:make_map_info(mode, lhs, a:is_abbr)
                     if s:match_map_info_string(
                     \       map_info, 'lhs', options, 'lhs')
                     \   && s:match_map_info_regexp(
@@ -94,7 +94,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         " {mode}, {lhs}
         let [mode, lhs] = [a:arg, a:1]
         call map_dict.add_map_info(
-        \   s:get_map_info(mode, lhs, a:is_abbr)
+        \   s:make_map_info(mode, lhs, a:is_abbr)
         \)
     elseif type(a:arg) == type("")
     \   && a:0 == 0
@@ -102,7 +102,7 @@ function! s:save_map(is_abbr, arg, ...) "{{{
         let mode = a:arg
         for lhs in s:get_all_lhs(mode, a:is_abbr)
             call map_dict.add_map_info(
-            \   s:get_map_info(mode, lhs, a:is_abbr)
+            \   s:make_map_info(mode, lhs, a:is_abbr)
             \)
         endfor
     else
@@ -160,7 +160,7 @@ function! s:get_all_lhs(mode, is_abbr) "{{{
     return r
 endfunction "}}}
 
-function! s:get_map_info(mode, lhs, is_abbr) "{{{
+function! s:make_map_info(mode, lhs, is_abbr) "{{{
     let r = {
     \   'buffer': {},
     \   'normal': {},
